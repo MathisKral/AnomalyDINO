@@ -8,8 +8,9 @@ import tifffile as tiff
 import time
 import torch
 
-from src.utils import augment_image, dists2map, plot_ref_images
-from src.post_eval import mean_top1p
+from src.model.utils import augment_image, dists2map
+from src.eval.visualize import plot_ref_images
+from src.eval.post_eval import mean_top1p
 
 def run_anomaly_detection(
         model,

@@ -1,10 +1,10 @@
-from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import os
 from tqdm import tqdm
-from .utils import get_dataset_info, dists2map
+from src.model.utils import dists2map, resize_mask_img
+from src.eval.dataset import get_dataset_info
 
 from  matplotlib.colors import LinearSegmentedColormap
 neon_violet = (0.5, 0.1, 0.5, 0.4)
@@ -93,3 +93,33 @@ def create_sample_plots(experiment_path, anomaly_maps_dir, seed, dataset, data_r
         plt.tight_layout()
         plt.savefig(f"{experiment_path}/{object_name}/anomaly_maps_examples_seed={seed}.png")
         plt.close()
+
+
+def plot_ref_images(img_list, mask_list, vis_background_list, grid_size, save_path, title = "Reference Images", img_names = None):
+    k = min(len(img_list), 32)  # reduce max number of ref samples to plot to 32
+
+    n_aug = len(img_list)//len(img_names)
+
+    fig, axs = plt.subplots(k, 3, figsize=(10, 3*k + 1.0))
+    if k == 1:
+        axs = axs.reshape(1, -1)
+    for i in range(k):
+        axs[i, 0].imshow(img_list[i])
+        axs[i, 1].imshow(vis_background_list[i])
+        axs[i, 2].imshow(img_list[i])
+        axs[i, 2].imshow(resize_mask_img(mask_list[i], img_list[i].shape, grid_size), alpha=0.5)
+        axs[i, 0].axis('off')
+        axs[i, 1].axis('off')
+        axs[i, 2].axis('off')
+        if i % n_aug == 0:
+            axs[i, 0].title.set_text(f"Image: {img_names[i // n_aug]}")
+        else:
+            axs[i, 0].title.set_text(f"Augmentation of Image {img_names[i // n_aug]}")
+        axs[i, 1].title.set_text("PCA + Mask")
+        axs[i, 2].title.set_text("Mask")
+    plt.tight_layout()
+    if save_path is None:
+        plt.show()
+    else:
+        plt.savefig(save_path + "reference_samples.png")
+    plt.close()

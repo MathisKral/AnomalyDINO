@@ -1,11 +1,4 @@
-*venv/
-dev/
-
-data/*
-data_utils/*
-paper_plots*/
-paper_tables*/
+.venvAnomalyDINO/
 results*/
-*personal.ipynb
-feature_extraction.ipynb
 src/__pycache__/
+out/

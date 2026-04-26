@@ -3,20 +3,20 @@ This evaluation scripts partly builds on the official evaluation script for MVTe
 """
 
 import json
-from sklearn.metrics import auc, roc_auc_score, average_precision_score, f1_score, precision_recall_curve, pairwise
+from sklearn.metrics import roc_auc_score, average_precision_score, precision_recall_curve
 import numpy as np
 import os
 import numpy as np
 import cv2
 from os import makedirs, path, listdir
-import argparse
 from PIL import Image
 from tqdm import tqdm
 import tifffile as tiff
 from scipy.ndimage import label
 from bisect import bisect
 
-from src.utils import dists2map
+from src.model.utils import dists2map
+from src.eval.dataset import get_objects_from_dataset
 
 
 
@@ -407,13 +407,6 @@ def eval_classification(gt_filenames, prediction_filenames, aggregation_statisti
     return auroc_clf, ap_clf, f1_clf
 
 
-def get_objects_from_dataset(dataset):
-    if dataset == "MVTec":
-        objects = ["bottle", "cable", "capsule", "carpet", "grid", "hazelnut", "leather", "metal_nut", "pill", "screw", "tile", "toothbrush", "transistor", "wood", "zipper"]
-    elif dataset == "VisA":
-        objects = ["candle", "capsules", "cashew", "chewinggum", "fryum", "macaroni1", "macaroni2", "pcb1", "pcb2", "pcb3", "pcb4", "pipe_fryum"]
-    return objects
-    
 
 def eval_finished_run(dataset, dataset_base_dir, anomaly_maps_dir, output_dir, seed = None, pro_integration_limit = 0.3, eval_clf = True, eval_segm = False, delete_tiff_files = True, aggregation_statistics = "meantop1p"):
     """

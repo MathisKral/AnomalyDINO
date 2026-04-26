@@ -6,11 +6,11 @@ from tqdm import trange
 
 import csv
 
-from src.utils import get_dataset_info 
-from src.detection import run_anomaly_detection
-from src.post_eval import eval_finished_run
-from src.visualize import create_sample_plots
-from src.backbones import get_model
+from src.eval.dataset import get_dataset_info 
+from src.eval.eval import run_anomaly_detection
+from src.eval.post_eval import eval_finished_run
+from src.eval.visualize import create_sample_plots
+from src.model.backbones import get_model
 
 
 class IntListAction(Action):
@@ -173,7 +173,8 @@ if __name__=="__main__":
                                     eval_clf = args.eval_clf,
                                     eval_segm = args.eval_segm)
                     
-                    create_sample_plots(results_dir, 
+                    if args.eval_segm: 
+                        create_sample_plots(results_dir, 
                                         anomaly_maps_dir = results_dir + f"/anomaly_maps/seed={seed}", 
                                         seed = seed,
                                         dataset = args.dataset, 
