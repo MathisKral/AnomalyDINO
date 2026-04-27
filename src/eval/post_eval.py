@@ -17,6 +17,7 @@ from bisect import bisect
 
 from src.model.utils import dists2map
 from src.eval.dataset import get_objects_from_dataset
+from src.model.utils import calc_anomaly_score
 
 
 
@@ -290,11 +291,6 @@ def compute_pro(anomaly_maps, ground_truth_maps):
     return np.concatenate((zero, fprs, one)), np.concatenate((zero, pros, one))
 
 
-def mean_top1p(distances):
-    if int(len(distances) * 0.01) == 0:
-        return np.max(distances)
-    else:
-        return np.mean(sorted(distances.flatten(), reverse = True)[:int(len(distances) * 0.01)])
 
 def max_anomaly_map(distances, img_size):
     anomaly_map = dists2map(distances, img_size)
@@ -382,7 +378,7 @@ def eval_classification(gt_filenames, prediction_filenames, aggregation_statisti
     del ground_truth
 
     if aggregation_statistics == "meantop1p":
-        predictions = [mean_top1p(dist.flatten()) for dist in predictions]
+        predictions = [calc_anomaly_score(dist.flatten()) for dist in predictions]
     elif aggregation_statistics == "max_anomaly_map":
         predictions = [max_anomaly_map(dist.flatten(), img_size) for dist, img_size in zip(predictions, gt_img_size)]
     elif aggregation_statistics == "max_patch_distance":

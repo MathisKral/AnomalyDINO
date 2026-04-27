@@ -13,7 +13,7 @@ import torch
 
 from tqdm import tqdm
 
-from src.model.utils import augment_image
+from src.model.utils import augment_image, calc_anomaly_score
 from src.model.backbones import DINOv2Wrapper
 
 
@@ -77,6 +77,19 @@ def fill_memory_bank(
     return knn_index
 
 
+def save_memory_bank(
+        memory_bank: faiss.IndexFlatL2,
+        pth: str
+) -> bool:
+    faiss.write_index(memory_bank, pth)
+
+    return True
+
+def load_memory_bank(
+        pth: str
+) -> faiss.IndexFlatL2:
+
+    return faiss.read_index(pth)
 
 def infer(
         img: np.ndarray,
@@ -137,7 +150,7 @@ def plot_distances(
     ax2.axis("off")
 
     ax1.title.set_text("Test Image")
-    ax2.title.set_text("Patch Distances")
+    ax2.title.set_text(f"Patch Distances, Score: {round(calc_anomaly_score(distances), 3)}")
 
     if save != "":
         fig.savefig(save)

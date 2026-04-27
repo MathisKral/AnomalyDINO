@@ -8,9 +8,8 @@ import tifffile as tiff
 import time
 import torch
 
-from src.model.utils import augment_image, dists2map
+from src.model.utils import augment_image, dists2map, calc_anomaly_score
 from src.eval.visualize import plot_ref_images
-from src.eval.post_eval import mean_top1p
 
 def run_anomaly_detection(
         model,
@@ -186,7 +185,7 @@ def run_anomaly_detection(
                 torch.cuda.synchronize() # Synchronize CUDA kernels before measuring time
                 inf_time = time.time() - start_time
                 inference_times[f"{type_anomaly}/{img_test_nr}"] = inf_time
-                anomaly_scores[f"{type_anomaly}/{img_test_nr}"] = mean_top1p(output_distances.flatten())
+                anomaly_scores[f"{type_anomaly}/{img_test_nr}"] = calc_anomaly_score(output_distances.flatten())
 
                 # Save the anomaly maps (raw as .npy or full resolution .tiff files)
                 img_test_nr = img_test_nr.split(".")[0]
@@ -210,7 +209,7 @@ def run_anomaly_detection(
                     plt.colorbar(ax3.imshow(d_masked), ax=ax3, fraction=0.12, pad=0.05, orientation="horizontal")
                     
                     # compute image level anomaly score (mean(top 1%) of patches = empirical tail value at risk for quantile 0.99)
-                    score_top1p = mean_top1p(distances)
+                    score_top1p = calc_anomaly_score(distances)
                     ax4.axvline(score_top1p, color='r', linestyle='dashed', linewidth=1, label=f"Anomaly Score: {score_top1p:.3f}")
                     ax4.legend()
                     ax4.hist(distances.flatten())

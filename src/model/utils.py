@@ -39,6 +39,12 @@ def resize_mask_img(mask, image_shape, grid_size1):
     return mask
 
 
+def calc_anomaly_score(distances):
+    """
+    Calculate the anomaly score as the mean top 1% of the distances
+    """
 
-
-
+    if int(len(distances) * 0.01) == 0:
+        return np.max(distances)
+    else:
+        return np.mean(sorted(distances.flatten(), reverse = True)[:int(len(distances) * 0.01)])
